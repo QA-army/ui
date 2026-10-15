@@ -16,7 +16,8 @@
   --run-passed: #079447;
   --run-failed: #c4372d;
   --run-ready: #59616e;
-  --run-running-dot: #e09b14;
+  --run-running: #2563eb;
+  --run-running-dot: #2563eb;
   --run-ready-dot: #667085;
   --font-body: "Inter", system-ui, sans-serif;
   --font-display: "Space Grotesk", "Inter", sans-serif;

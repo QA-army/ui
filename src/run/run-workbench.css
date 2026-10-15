@@ -1,6 +1,6 @@
 /* Run workbench rules. Notes stay in comments; the page shows evidence, status, and actions.
    Square corners. Header Rerun and Stop Test are the only bordered buttons.
-   Live time, the in-progress step chip, and unexecuted dots fade between full strength and 50% over 2 seconds. The header running mark is a solid amber square that rotates over 2 seconds, with no scale and no fade. Reduced motion holds it still.
+   Live time, the in-progress step chip, and unexecuted dots fade between full strength and 50% over 2 seconds. The header running mark is a solid blue square that rotates over 2 seconds, with no scale and no fade. Reduced motion holds it still.
    Do not put a RUNNING badge or a Live label in the header. The in-progress step chip still says RUNNING.
    Passed, failed, and error step marks are solid squares, not chips.
    Theme and feedback sit pinned to the transcript column's bottom-left.
@@ -9,8 +9,8 @@
 .run-shell {
   --bg: #f7f5f1; --paper: #f7f5f1; --surface: #fffefa; --surface-raised: #ffffff; --stage-canvas: #ffffff; --paper-soft: #fbfaf7;
   --line-soft: #d8d4cb; --text: #303036; --muted: #66666e; --ink: #0b0b0e;
-  --run-passed: #079447; --run-failed: #c4372d; --run-ready: #59616e;
-  --run-running-dot: #e09b14; --run-ready-dot: #667085;
+  --run-passed: #079447; --run-failed: #c4372d; --run-ready: #8b93a0;
+  --run-running: #2563eb; --run-running-dot: #2563eb; --run-ready-dot: #8b93a0;
   --success: var(--run-passed); --danger: var(--run-failed); --danger-soft: #fce3df;
 }
 :root[data-theme='dark'] .run-shell {
@@ -53,31 +53,40 @@
 }
 .run-shell .run-badge, .run-shell .step-outcome {
   display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;
-  background: var(--run-ready); color: #ffffff; padding: 3px 6px;
+  background: #59616e; color: #ffffff; padding: 3px 6px;
   font: 600 10px/1.4 var(--font-mono); letter-spacing: .03em;
 }
+.run-shell .run-badge--ready { background: #8b93a0; color: #0b0b0e; }
+.run-shell .run-badge--provisioning { background: #3a4250; color: #ffffff; }
 .run-shell .run-badge--passed { background: var(--run-passed); color: #ffffff; }
-.run-shell .run-badge--failed, .run-shell .run-badge--error { background: var(--run-failed); color: #ffffff; }
+.run-shell .run-badge--flaky { background: #4eada3; color: #0b0b0e; }
+.run-shell .run-badge--failed { background: var(--run-failed); color: #ffffff; }
+.run-shell .run-badge--error { background: #ffe500; color: #0b0b0e; }
+.run-shell .run-badge--cancelled { background: #737373; color: #ffffff; }
+.run-shell .run-badge--mocked { background: #e09b14; color: #0b0b0e; }
 .run-shell .step-outcome--passed, .run-shell .step-outcome--failed, .run-shell .step-outcome--error,
 .run-shell .step-outcome--mark { background: transparent; color: var(--text); padding: 0; }
-.run-shell .run-badge--running::before, .run-shell .run-badge--provisioning::before,
-.run-shell .run-badge--ready::before, .run-shell .run-badge--queued::before,
 .run-shell .step-outcome--waiting::before {
-  content: ''; display: inline-block; width: 5px; height: 5px; background: var(--run-ready-dot);
+  content: ''; display: inline-block; width: 5px; height: 5px; background: #59616e;
 }
 .run-shell .step-outcome--mark::before { content: none; }
 .run-shell .step-outcome--waiting.step-outcome--mark svg { display: block; }
-.run-shell .run-badge--running::before, .run-shell .run-badge--provisioning::before { background: var(--run-running-dot); }
-.run-shell .step-outcome--started { background: var(--run-passed); color: #ffffff; animation: run-step-fade 2s ease-in-out infinite; }
+.run-shell .step-outcome--started { background: var(--run-running); color: #ffffff; animation: run-step-fade 2s ease-in-out infinite; }
 .run-shell .step-outcome--started svg, .run-shell .step-outcome--waiting svg { display: none; }
 .run-shell .run-status-dot--passed { background: var(--run-passed); }
-.run-shell .run-status-dot--failed, .run-shell .run-status-dot--error { background: var(--run-failed); }
-.run-shell .run-status-dot--running, .run-shell .run-status-dot--provisioning {
-  width: 13px; height: 13px; background: var(--run-running-dot); opacity: 1; scale: 1;
+.run-shell .run-status-dot--failed { background: var(--run-failed); }
+.run-shell .run-status-dot--error { background: #ffe500; }
+.run-shell .run-status-dot--flaky { background: #4eada3; }
+.run-shell .run-status-dot--mocked { background: #e09b14; }
+.run-shell .run-status-dot--cancelled { background: #737373; }
+.run-shell .run-status-dot--ready { background: #8b93a0; }
+.run-shell .run-status-dot--queued { background: #59616e; }
+.run-shell .run-status-dot--provisioning { background: #3a4250; }
+.run-shell .run-status-dot--running {
+  width: 13px; height: 13px; background: var(--run-running); opacity: 1; scale: 1;
   animation: run-status-spin 2s linear infinite;
 }
 @keyframes run-status-spin { to { transform: rotate(360deg); } }
-.run-shell .run-status-dot--ready, .run-shell .run-status-dot--queued { background: var(--run-ready-dot); }
 /* The transcript label, step count, and time sit in the pane. They are not a separate bar. */
 .run-shell .run-transcript-heading { position: static; padding: 6px 12px 2px; gap: 8px; background: transparent; border-bottom: 0; }
 .run-shell .run-transcript-heading strong,

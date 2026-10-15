@@ -1,6 +1,6 @@
 /** View of a Run the open page can render. The hosted service fills this in. */
 
-export type RunStatus = "READY" | "QUEUED" | "PROVISIONING" | "RUNNING" | "PASSED" | "FAILED" | "ERROR" | "CANCELLED";
+export type RunStatus = "READY" | "QUEUED" | "PROVISIONING" | "RUNNING" | "PASSED" | "FLAKY" | "FAILED" | "ERROR" | "CANCELLED" | "MOCKED";
 export type RunOutcome = "PASSED" | "FAILED" | "ERROR" | "CANCELLED" | "SKIPPED";
 export type RunConnection = "connected" | "refreshing" | "reconnecting";
 

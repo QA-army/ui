@@ -35,7 +35,7 @@ export function activityIcon(activity: TranscriptActivity) {
 }
 
 export function isTerminalStatus(status: Run["status"]) {
-  return ["PASSED", "FAILED", "ERROR", "CANCELLED"].includes(status);
+  return ["PASSED", "FLAKY", "FAILED", "ERROR", "CANCELLED", "MOCKED"].includes(status);
 }
 
 export function finalDuration(events: readonly RunEvent[]) {

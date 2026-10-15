@@ -15,6 +15,7 @@
   import ReplayBar from "../components/ReplayBar.svelte";
   import RunHeader from "../components/RunHeader.svelte";
   import StatusBadge from "../components/StatusBadge.svelte";
+  import RunStateReview from "./RunStateReview.svelte";
   import StepKindBadge from "../components/StepKindBadge.svelte";
   import TextField from "../components/TextField.svelte";
   import Transcript from "../components/Transcript.svelte";
@@ -37,7 +38,7 @@
     { label: "Unavailable", src: unavailableState },
   ];
   const kinds = Object.keys(stepKinds) as StepKind[];
-  const statuses = ["passed", "failed", "error", "ready", "cancelled"] as const;
+  const statuses = ["ready", "queued", "provisioning", "running", "passed", "flaky", "failed", "error", "cancelled", "mocked"] as const;
   const steps = [
     { number: 1, type: "ACT", title: "Open the pricing page", outcome: "PASSED", time: "0:04" },
     { number: 2, type: "ASSERT", title: "The price is visible", outcome: "FAILED", time: "0:11" },
@@ -66,6 +67,11 @@
       {theme === "dark" ? "Light" : "Dark"}
     </button>
   </header>
+
+  <section id="review">
+    <h2>Run page</h2>
+    <RunStateReview />
+  </section>
 
   <section>
     <h2>Desktop</h2>
@@ -109,7 +115,7 @@
     </div>
   </section>
 
-  <section>
+  <section id="status">
     <h2>Status</h2>
     <div class="row">
       {#each statuses as status (status)}

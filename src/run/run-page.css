@@ -83,20 +83,34 @@
   flex: 0 0 auto;
   background: #667085;
 }
-.run-status-dot--passed { background: #0ba75a; }
-.run-status-dot--failed, .run-status-dot--error { background: var(--danger); }
-.run-status-dot--running, .run-status-dot--provisioning, .run-status-dot--queued { background: #e09b14; }
+.run-status-dot--passed { background: #079447; }
+.run-status-dot--failed { background: var(--danger); }
+.run-status-dot--error { background: #ffe500; }
+.run-status-dot--flaky { background: #4eada3; }
+.run-status-dot--mocked { background: #e09b14; }
+.run-status-dot--cancelled { background: #737373; }
+.run-status-dot--ready { background: #8b93a0; }
+.run-status-dot--queued { background: #59616e; }
+.run-status-dot--provisioning { background: #3a4250; }
+.run-status-dot--running { background: #2563eb; }
 .run-header__duration { color: var(--muted); font: 700 11px var(--font-mono); }
 .run-badge {
-  padding: 4px 9px;
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 6px;
   color: #fff;
   background: #59616e;
-  font: 700 10px var(--font-mono);
-  letter-spacing: .08em;
+  font: 600 10px/1.4 var(--font-mono);
+  letter-spacing: .03em;
 }
 .run-badge--passed { background: #079447; }
-.run-badge--failed, .run-badge--error { background: #c4372d; }
+.run-badge--flaky { background: #4eada3; color: #0b0b0e; }
+.run-badge--failed { background: #c4372d; }
+.run-badge--error { background: #ffe500; color: #0b0b0e; }
 .run-badge--cancelled { background: #737373; }
+.run-badge--mocked { background: #e09b14; color: #0b0b0e; }
+.run-badge--ready { background: #8b93a0; color: #0b0b0e; }
+.run-badge--provisioning { background: #3a4250; }
 .run-close {
   width: 34px;
   height: 34px;
@@ -122,7 +136,7 @@
   border-radius: 0;
   background: var(--success);
 }
-.run-connection--refreshing i { background: #e09b14; }
+.run-connection--refreshing i { background: #2563eb; }
 .run-connection--reconnecting i { background: var(--danger); }
 .run-connection-warning {
   padding: 7px 18px;

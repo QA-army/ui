@@ -42,6 +42,23 @@ All six Run page states, at phone width.
 | --- | --- | --- | --- | --- | --- |
 | ![Passed](docs/gallery/state-passed.png) | ![Running](docs/gallery/state-running.png) | ![Failed](docs/gallery/state-failed.png) | ![Error](docs/gallery/state-error.png) | ![Ready](docs/gallery/state-ready.png) | ![Unavailable](docs/gallery/state-unavailable.png) |
 
+## State buttons
+
+Mock states. Flaky is a finished run with some steps passed. Ready, Queued, and Provisioning are one grey that gets darker. Running is blue. Flaky is teal. Cancelled is one grey for the square and the word. Error is bright yellow. Mocked is amber.
+
+| State | Color |
+| --- | --- |
+| Ready | `#8B93A0` |
+| Queued | `#59616E` |
+| Provisioning | `#3A4250` |
+| Running | `#2563EB` |
+| Flaky | `#4EADA3` |
+| Passed | `#079447` |
+| Failed | `#C4372D` |
+| Error | `#FFE500` |
+| Cancelled | `#737373` |
+| Mocked | `#E09B14` |
+
 ## Component gallery
 
 ### Status
