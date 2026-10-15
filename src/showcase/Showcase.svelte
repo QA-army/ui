@@ -1,6 +1,11 @@
 <script lang="ts">
   import ActionButton from "../components/ActionButton.svelte";
-  import MobileRun from "../components/MobileRun.svelte";
+  import errorState from "../../docs/gallery/state-error.png";
+  import failedState from "../../docs/gallery/state-failed.png";
+  import passedState from "../../docs/gallery/state-passed.png";
+  import readyState from "../../docs/gallery/state-ready.png";
+  import runningState from "../../docs/gallery/state-running.png";
+  import unavailableState from "../../docs/gallery/state-unavailable.png";
   import ReplayBar from "../components/ReplayBar.svelte";
   import RunHeader from "../components/RunHeader.svelte";
   import StatusBadge from "../components/StatusBadge.svelte";
@@ -9,7 +14,14 @@
   import Transcript from "../components/Transcript.svelte";
   import { stepKinds, type StepKind } from "../components/step-kind.ts";
 
-  const mobileStates = ["passed", "running", "failed", "error"] as const;
+  const runStates = [
+    { label: "Passed", src: passedState },
+    { label: "Running", src: runningState },
+    { label: "Failed", src: failedState },
+    { label: "Error", src: errorState },
+    { label: "Ready", src: readyState },
+    { label: "Unavailable", src: unavailableState },
+  ];
   const kinds = Object.keys(stepKinds) as StepKind[];
   const statuses = ["passed", "failed", "error", "ready", "cancelled"] as const;
   const steps = [
@@ -43,10 +55,23 @@
 
   <section>
     <h2>Mobile</h2>
-    <div class="phones">
-      {#each mobileStates as state (state)}
-        <MobileRun mode={state} />
-      {/each}
+    <div class="run-states">
+      <table>
+        <thead>
+          <tr>
+            {#each runStates as item (item.label)}
+              <th>{item.label}</th>
+            {/each}
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            {#each runStates as item (item.label)}
+              <td><img src={item.src} alt="{item.label} run" /></td>
+            {/each}
+          </tr>
+        </tbody>
+      </table>
     </div>
   </section>
 
@@ -131,7 +156,11 @@
     cursor: pointer;
   }
   .theme:hover { background: var(--paper-soft); color: var(--ink); }
-  .phones { display: grid; gap: 28px; justify-items: center; }
+  .run-states { overflow-x: auto; }
+  .run-states table { border-collapse: collapse; }
+  .run-states th { padding: 0 8px 8px; color: var(--muted); font: 500 11px / 1.4 var(--font-mono, ui-monospace, monospace); letter-spacing: 0.08em; text-align: left; text-transform: uppercase; }
+  .run-states td { padding: 0 8px; vertical-align: top; }
+  .run-states img { width: 280px; height: auto; display: block; border: 1px solid var(--line-soft); }
   .stack { display: grid; border: 1px solid var(--line-soft); }
   .row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
   .actions { margin-top: 12px; }
