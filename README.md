@@ -6,6 +6,15 @@ This repository is the standalone interface for the QA workspace. It is separate
 
 The full run page is [`src/run/RunDetail.svelte`](src/run/RunDetail.svelte). The hosted service supplies the Run, its events, and evidence. This package does not call that service.
 
+Omitted props keep the current page. A host can pass:
+
+- `productName` and `themeStorageKey`, so the title, share text, and saved theme are not tied to QA.army.
+- `details` and `issues` snippets, for provenance and findings.
+- `panels`, to rename or drop Console, Network, Screengraph, and Metrics.
+- `metrics`, to replace the browser credit rows with the host's own rows.
+- `hasRecording={false}`, so a screenshot-only run does not show a missing video as a failure.
+- `note` on a test step, for a short honesty line such as `replayed · 0 model calls`.
+
 ## Desktop
 
 The run page at desktop width, light theme.

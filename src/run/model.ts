@@ -130,6 +130,8 @@ export interface RunTestStep {
   readonly type: string;
   readonly instruction: string;
   readonly enabled: boolean;
+  /** Host note for this step, such as "replayed · 0 model calls". */
+  readonly note?: string | null;
 }
 
 export interface RunTest {
@@ -146,4 +148,16 @@ export interface RunPageState {
   readonly warning: string | null;
   readonly run: Run | null;
   readonly events: readonly RunEvent[];
+}
+
+/** A diagnostic tab. Omit one to hide that panel. Labels are the host's words. */
+export interface EvidencePanel {
+  readonly id: "console" | "network" | "screengraph" | "metrics";
+  readonly label: string;
+}
+
+/** One row in the metrics panel. The host supplies the label and the value. */
+export interface RunMetric {
+  readonly label: string;
+  readonly value: string;
 }

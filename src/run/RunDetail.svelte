@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
   import { onDestroy } from 'svelte';
   import { SvelteSet } from 'svelte/reactivity';
   import '../showcase/tokens.css';
@@ -6,7 +7,7 @@
   import './run-workbench.css';
   import './run-page.css';
   import OutcomeIcon from './OutcomeIcon.svelte';
-  import type { RunClient, RunPageState, RunTest } from './model';
+  import type { EvidencePanel, RunClient, RunMetric, RunPageState, RunTest } from './model';
   import { projectRunTimeline, projectTranscript, type TranscriptStep } from './run-transcript';
   import { finalDuration, formatDate, formatDuration, isTerminalStatus, resultSummary } from './run-detail-model';
   import RunMedia from './RunMedia.svelte';
@@ -19,10 +20,13 @@
   import ShareRun from './ShareRun.svelte';
   import RunScreenshots from './RunScreenshots.svelte';
 
-  let { page, test = null, client, shareUrl = null, onClose, onRefresh, onRerun, onCancel }: {
+  let { page, test = null, client, shareUrl = null, onClose, onRefresh, onRerun, onCancel, productName = 'QA.army', themeStorageKey = 'qa-army-ui-theme', hasRecording = true, panels = undefined, metrics = undefined, details, issues }: {
     page: RunPageState; test?: RunTest | null; client: RunClient; shareUrl?: string | null;
     onClose: () => void; onRefresh: () => void;
     onRerun?: () => Promise<void>; onCancel?: () => Promise<void>;
+    productName?: string; themeStorageKey?: string; hasRecording?: boolean;
+    panels?: readonly EvidencePanel[]; metrics?: readonly RunMetric[];
+    details?: Snippet; issues?: Snippet;
   } = $props();
   let selection = $state<{ eventId: string | null; seekVersion: number }>({ eventId: null, seekVersion: 0 });
   let expanded = $state<Record<string, boolean>>({});
@@ -42,7 +46,16 @@
   let cancelError = $state<string | null>(null);
   let rerunning = $state(false);
   let rerunError = $state<string | null>(null);
-  let theme = $state(document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light');
+  let themeChoice = $state<'light' | 'dark' | null>(null);
+  let theme = $derived.by(() => {
+    if (themeChoice) return themeChoice;
+    const stored = window.localStorage.getItem(themeStorageKey);
+    if (stored === 'dark' || stored === 'light') return stored;
+    return document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light';
+  });
+  $effect(() => {
+    document.documentElement.dataset.theme = theme;
+  });
   let recording = $state<{ runId: string; url: string | null; mediaType: string; error: string | null } | null>(null);
   const receiveRecording = (value: NonNullable<typeof recording>) => { recording = value; };
   let active = true;
@@ -51,7 +64,7 @@
   $effect(() => {
     if (!run) return;
     const previousTitle = document.title;
-    document.title = `${test?.name ?? 'Test Run'} · ${run.status} · QA.army`;
+    document.title = `${test?.name ?? 'Test Run'} · ${run.status} · ${productName}`;
     return () => { document.title = previousTitle; };
   });
   let prerequisites = $derived(run?.journey?.unresolved_prerequisites.map(message => ({ message })) ?? []);
@@ -68,6 +81,7 @@
       if (latest === 'STARTED' || latest === 'FAILED' || latest === 'ERROR') latchedOpen.add(step.stepId);
     }
   });
+  let notes = $derived(new Map((test?.steps ?? []).flatMap(step => step.note ? [[step.id, step.note] as const] : [])));
   let timeline = $derived(projectRunTimeline(events));
   let selectedId = $derived.by(() => {
     const chosen = events.find(event => event.eventId === selection.eventId);
@@ -85,10 +99,11 @@
   const select = (eventId: string) => { selection = { eventId, seekVersion: selection.seekVersion + 1 }; };
   const follow = (eventId: string) => { selection = { ...selection, eventId }; };
   function toggleTheme() {
-    theme = theme === 'light' ? 'dark' : 'light';
-    document.documentElement.dataset.theme = theme;
-    window.localStorage.setItem('qa-army-ui-theme', theme);
-    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'light' ? '#f2efe9' : '#0b0b0e');
+    const next = theme === 'light' ? 'dark' : 'light';
+    themeChoice = next;
+    document.documentElement.dataset.theme = next;
+    window.localStorage.setItem(themeStorageKey, next);
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', next === 'light' ? '#f2efe9' : '#0b0b0e');
   }
   async function cancel() {
     if (!run || cancelling || !onCancel) return;
@@ -114,7 +129,7 @@
 {:else if run}
   <div class="run-shell" data-renderer="svelte">
     <header class="run-header">
-      <div class="run-header__identity"><span class="run-status-dot run-status-dot--{run.status.toLowerCase()}" aria-hidden="true"></span><div><div class="run-title-row"><h1 id="run-title">{test?.name ?? 'Test Run'}</h1><ShareRun url={shareUrl} shareTitle={`${test?.name ?? 'Test Run'} · ${run.status} · QA.army`} /></div><p>{formatDate(run.resolvedAt)}</p></div></div>
+      <div class="run-header__identity"><span class="run-status-dot run-status-dot--{run.status.toLowerCase()}" aria-hidden="true"></span><div><div class="run-title-row"><h1 id="run-title">{test?.name ?? 'Test Run'}</h1><ShareRun url={shareUrl} shareTitle={`${test?.name ?? 'Test Run'} · ${run.status} · ${productName}`} /></div><p>{formatDate(run.resolvedAt)}</p>{#if details}<div class="run-provenance">{@render details()}</div>{/if}</div></div>
       <div class="run-header__actions">
         <!-- Rerun and Stop Test are the rightmost header controls.
              Passed, Failed, and Error sit to the left of the elapsed time.
@@ -165,7 +180,7 @@
               <div class="transcript-step-row">
                 <button class="transcript-step" aria-expanded={isExpanded} onclick={() => { expanded[step.stepId] = !isExpanded; }} onfocus={() => { focusedStepId = step.stepId; }} onblur={() => { if (focusedStepId === step.stepId) focusedStepId = null; }}>
                   <span class="transcript-step__number">{step.position}</span>
-                  <span class="transcript-step__content"><StepKindBadge type={step.stepType} reveal={actionReveal} /><span class="transcript-step__title" class:is-pending={outcome === 'Waiting' || outcome === 'SKIPPED'}>{step.title}</span></span>
+                  <span class="transcript-step__content"><StepKindBadge type={step.stepType} reveal={actionReveal} /><span class="transcript-step__title" class:is-pending={outcome === 'Waiting' || outcome === 'SKIPPED'}>{step.title}</span>{#if notes.get(step.stepId)}<span class="step-note">{notes.get(step.stepId)}</span>{/if}</span>
                   <!-- Passed, failed, error, unexecuted, and queued are the square only. The word stays for assistive tech. -->
                   <span class="step-outcome step-outcome--{outcome.toLowerCase()}" class:step-outcome--mark={iconOnlyOutcome(outcome, outcomeLabel)}><OutcomeIcon outcome={outcomeLabel === 'UNEXECUTED' ? 'UNEXECUTED' : outcome === 'Waiting' ? outcomeLabel : outcome} />{#if iconOnlyOutcome(outcome, outcomeLabel)}<span class="visually-hidden">{outcomeLabel}</span>{:else}{outcomeLabel}{/if}</span>
                 </button>
@@ -198,10 +213,13 @@
             {#key run.id}<RunFeedback runs={client} runId={run.id} {terminal} />{/key}
           </div>
           {/snippet}
+          {#if issues}<div class="run-issues">{@render issues()}</div>{/if}
           <RunScreenshots runs={client} runId={run.id} {events} {terminal} viewport={recordedViewport} planSteps={test?.steps ?? []} />
           <section class="run-recording-download" aria-label="Video recording evidence">
             <strong>Video recording</strong>
-            {#if summaryRecording?.url}
+            {#if !hasRecording}
+              <p>This run records screenshots and does not include a video.</p>
+            {:else if summaryRecording?.url}
               <div class="run-recording-attachment">
                 <span class="run-recording-attachment__file">
                   <span>Full-Chrome recording</span>
@@ -221,13 +239,17 @@
       {#snippet second()}
       <RunSplit label="Resize browser evidence and Screengraph" direction="horizontal" initial={55} minimum={30} maximum={85}>
       {#snippet first()}
-      <section class="run-visual-pane" aria-label="Browser Live View, recording replay, and evidence">
-        <RunMedia runs={client} runId={run.id} {terminal} liveViewReady={events.some(event => event.kind === 'browser.state' && event.type === 'LIVE_VIEW_READY')} selectedOffsetMs={selectedEvent?.replayOffsetMs ?? null} selectedStepId={selectedEvent?.correlation.stepId ?? null} seekVersion={selection.seekVersion} {timeline} totalSteps={steps.filter(step => step.enabled).length} elapsedMs={duration} viewport={recordedViewport} onSelect={select} onPlayback={follow} onRecording={receiveRecording} />
+      <section class="run-visual-pane" aria-label={terminal && !hasRecording ? 'Screenshots' : 'Browser Live View, recording replay, and evidence'}>
+        {#if terminal && !hasRecording}
+          <RunScreenshots runs={client} runId={run.id} {events} {terminal} viewport={recordedViewport} planSteps={test?.steps ?? []} />
+        {:else}
+          <RunMedia runs={client} runId={run.id} {terminal} liveViewReady={events.some(event => event.kind === 'browser.state' && event.type === 'LIVE_VIEW_READY')} selectedOffsetMs={selectedEvent?.replayOffsetMs ?? null} selectedStepId={selectedEvent?.correlation.stepId ?? null} seekVersion={selection.seekVersion} {timeline} totalSteps={steps.filter(step => step.enabled).length} elapsedMs={duration} viewport={recordedViewport} onSelect={select} onPlayback={follow} onRecording={receiveRecording} />
+        {/if}
       </section>
       {/snippet}
       {#snippet second()}
       <section class="run-screengraph-pane" aria-label="Diagnostic panels">
-        <RunEvidence runs={client} runId={run.id} {terminal} {events} viewport={recordedViewport} planSteps={test?.steps ?? []} selectedStepId={selectedEvent?.correlation.stepId ?? null} onSelect={select} />
+        <RunEvidence runs={client} runId={run.id} {terminal} {events} viewport={recordedViewport} planSteps={test?.steps ?? []} selectedStepId={selectedEvent?.correlation.stepId ?? null} onSelect={select} {panels} suppliedMetrics={metrics} />
       </section>
       {/snippet}
       </RunSplit>
@@ -264,6 +286,9 @@
   }
 
   .run-title-row { display: flex; align-items: center; gap: 4px; min-width: 0; }
+  .run-provenance, .run-issues, .step-note { color: var(--muted); font: 11px/1.5 var(--font-mono); }
+  .run-provenance, .run-issues { margin-top: 6px; }
+  .step-note { display: block; }
   .run-footer-actions { display: flex; align-items: center; justify-content: flex-start; gap: 8px; width: max-content; }
   .theme-toggle { display: grid; place-items: center; width: 32px; min-height: 32px; padding: 4px; border: 0; background: transparent; color: var(--muted); box-shadow: none; }
   .theme-toggle:hover { color: var(--text); }

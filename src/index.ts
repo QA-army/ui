@@ -8,4 +8,4 @@ export { default as TextField } from "./components/TextField.svelte";
 export { default as Transcript } from "./components/Transcript.svelte";
 export { stepKind, stepKinds, type StepKind, type StepMark } from "./components/step-kind.ts";
 export { default as RunPage } from "./run/RunDetail.svelte";
-export type { Run, RunClient, RunEvent, RunPageState, RunTest } from "./run/model.ts";
+export type { Run, RunClient, RunEvent, RunMetric, RunPageState, RunTest, EvidencePanel } from "./run/model.ts";

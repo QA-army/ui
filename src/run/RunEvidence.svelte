@@ -3,24 +3,30 @@
   import NetworkPanel from './NetworkPanel.svelte';
   import RunScreenshots from './RunScreenshots.svelte';
   import { projectNetworkRequests } from './network-evidence';
-  import type { RunClient, RunEvent, BrowserDebuggerRecord, BrowserMetrics } from './model';
+  import type { RunClient, RunEvent, BrowserDebuggerRecord, BrowserMetrics, EvidencePanel, RunMetric } from './model';
   import type { TranscriptPlanStep } from './run-transcript';
-  let { runs, runId, terminal, events, selectedStepId, viewport = null, planSteps = [], onSelect }: {
+  const defaultPanels: readonly EvidencePanel[] = [
+    { id: 'console', label: 'Console' },
+    { id: 'network', label: 'Network' },
+    { id: 'screengraph', label: 'Screengraph' },
+    { id: 'metrics', label: 'Metrics' },
+  ];
+  let { runs, runId, terminal, events, selectedStepId, viewport = null, planSteps = [], onSelect, panels = defaultPanels, suppliedMetrics = null }: {
     runs: RunClient; runId: string; terminal: boolean; events: readonly RunEvent[];
     selectedStepId: string | null; viewport?: { width: number; height: number } | null; planSteps?: readonly TranscriptPlanStep[]; onSelect: (eventId: string) => void;
+    panels?: readonly EvidencePanel[]; suppliedMetrics?: readonly RunMetric[] | null;
   } = $props();
-  type Panel = 'console' | 'network' | 'screengraph' | 'metrics';
+  type Panel = EvidencePanel['id'];
   type DebuggerPanel = 'console' | 'network';
-  const panels: readonly Panel[] = ['console', 'network', 'screengraph', 'metrics'];
-  const labels: Record<Panel, string> = { console: 'Console', network: 'Network', screengraph: 'Screengraph', metrics: 'Metrics' };
   let panel = $state<Panel>('console');
+  let visiblePanel = $derived(panels.some(item => item.id === panel) ? panel : panels[0]?.id ?? 'console');
   let debuggerRecords = $state.raw<Record<DebuggerPanel, readonly BrowserDebuggerRecord[] | null>>({ console: null, network: null });
   let debuggerFailures = $state.raw<Record<DebuggerPanel, string | null>>({ console: null, network: null });
   let metricsFailure = $state<string | null>(null);
   let evidenceRetry = $state(0);
   let networkRows = $derived(projectNetworkRequests(debuggerRecords.network ?? []));
-  let records = $derived(panel === 'console' || panel === 'network' ? debuggerRecords[panel] : null);
-  let panelFailure = $derived(panel === 'metrics' ? metricsFailure : panel === 'console' || panel === 'network' ? debuggerFailures[panel] : null);
+  let records = $derived(visiblePanel === 'console' || visiblePanel === 'network' ? debuggerRecords[visiblePanel] : null);
+  let panelFailure = $derived(visiblePanel === 'metrics' ? metricsFailure : visiblePanel === 'console' || visiblePanel === 'network' ? debuggerFailures[visiblePanel] : null);
   let metrics = $state.raw<BrowserMetrics | null>(null);
   let updatesPaused = $state(false);
   let loadedRun = '';
@@ -29,7 +35,8 @@
   // Keep the last accepted snapshot visible during refresh/reconnect. The service
   // adapter owns transport, authorization and redaction; UI never assumes completion.
   $effect(() => {
-    const client = runs, id = runId, final = terminal, started = hasActivity; evidenceRetry;
+    const client = runs, id = runId, final = terminal, started = hasActivity, hostMetrics = suppliedMetrics;
+    const enabled = new Set(panels.map(item => item.id)); evidenceRetry;
     let active = true;
     let timer: ReturnType<typeof setTimeout> | undefined;
     if (loadedRun !== id) {
@@ -39,6 +46,7 @@
     }
     debuggerFailures = { console: null, network: null }; updatesPaused = false;
     if (final) for (const type of ['console', 'network'] as const) {
+      if (!enabled.has(type)) continue;
       void client.loadDebugger(id, type).then(value => {
         if (active) debuggerRecords = { ...debuggerRecords, [type]: value };
       }).catch(error => {
@@ -46,7 +54,8 @@
       });
     }
     if (!started) debuggerRecords = { console: [], network: [] };
-    if (!final && started) {
+    const wantsLive = enabled.has('console') || enabled.has('network') || (enabled.has('metrics') && !hostMetrics);
+    if (!final && started && wantsLive) {
       const read = client.readActivity?.bind(client);
       if (!read) {
         debuggerFailures = { console: 'Live activity is unavailable. Try again.', network: 'Live activity is unavailable. Try again.' };
@@ -75,44 +84,47 @@
     return () => { active = false; clearTimeout(timer); };
   });
   $effect(() => {
-    const client = runs, id = runId, selectedPanel = panel, final = terminal; evidenceRetry;
+    const client = runs, id = runId, selectedPanel = visiblePanel, final = terminal, hostMetrics = suppliedMetrics, showMetrics = panels.some(item => item.id === 'metrics'); evidenceRetry;
     let active = true;
-    if (!final) return;
     metricsFailure = null;
-    if (final && selectedPanel === 'metrics') void client.loadMetrics(id).then(value => { if (active) metrics = value; })
+    if (final && !hostMetrics && showMetrics && selectedPanel === 'metrics') void client.loadMetrics(id).then(value => { if (active) metrics = value; })
       .catch(error => { if (active) metricsFailure = error instanceof Error ? error.message : 'Metrics are unavailable.'; });
     return () => { active = false; };
   });
 
   function keyboard(event: KeyboardEvent, current: Panel) {
-    const index = panels.indexOf(current);
-    const next = event.key === 'Home' ? panels[0] : event.key === 'End' ? panels.at(-1) : event.key === 'ArrowRight' ? panels[(index + 1) % panels.length] : event.key === 'ArrowLeft' ? panels[(index - 1 + panels.length) % panels.length] : undefined;
+    const ids = panels.map(item => item.id);
+    const index = ids.indexOf(current);
+    const next = event.key === 'Home' ? ids[0] : event.key === 'End' ? ids.at(-1) : event.key === 'ArrowRight' ? ids[(index + 1) % ids.length] : event.key === 'ArrowLeft' ? ids[(index - 1 + ids.length) % ids.length] : undefined;
     if (next) { event.preventDefault(); panel = next; document.getElementById(`browser-evidence-tab-${next}`)?.focus(); }
   }
 </script>
 <section class="run-evidence" aria-label="Run diagnostic evidence">
-  <div class="browser-media__tabs" role="tablist" aria-label="Browser evidence">
-    {#each panels as name (name)}
-      <button id="browser-evidence-tab-{name}" role="tab" aria-label={labels[name]} aria-describedby={name === 'console' || name === 'network' ? `browser-evidence-count-${name}` : undefined} aria-controls="browser-evidence-panel-{name}" aria-selected={panel === name} tabindex={panel === name ? 0 : -1} onclick={() => panel = name} onkeydown={event => keyboard(event, name)}>
-        {labels[name]}
-        {#if name === 'console' || name === 'network'}<span class="browser-tab-count" aria-hidden="true">{debuggerRecords[name] ? name === 'network' ? networkRows.length : debuggerRecords[name].length : debuggerFailures[name] ? '!' : '—'}</span>{/if}
+  <div class="browser-media__tabs" role="tablist" aria-label="Run evidence">
+    {#each panels as item (item.id)}
+      <button id="browser-evidence-tab-{item.id}" role="tab" aria-label={item.label} aria-describedby={item.id === 'console' || item.id === 'network' ? `browser-evidence-count-${item.id}` : undefined} aria-controls="browser-evidence-panel-{item.id}" aria-selected={visiblePanel === item.id} tabindex={visiblePanel === item.id ? 0 : -1} onclick={() => panel = item.id} onkeydown={event => keyboard(event, item.id)}>
+        {item.label}
+        {#if item.id === 'console' || item.id === 'network'}<span class="browser-tab-count" aria-hidden="true">{debuggerRecords[item.id] ? item.id === 'network' ? networkRows.length : debuggerRecords[item.id].length : debuggerFailures[item.id] ? '!' : '—'}</span>{/if}
       </button>
     {/each}
   </div>
-  <!-- Status captions such as "Live activity" and "Updates interrupted. Reconnecting…" stay out of the page. A running Run already shows Console and Network counts; reconnect copy stays inside the open panel. -->
-  {#each ['console', 'network'] as name (name)}
-    <span class="visually-hidden" id="browser-evidence-count-{name}">{debuggerRecords[name as DebuggerPanel] ? `${name === 'network' ? networkRows.length : debuggerRecords.console?.length} captured ${name === 'network' ? 'requests' : 'events'}` : debuggerFailures[name as DebuggerPanel] ? 'Evidence unavailable' : 'Count not yet available'}</span>
+  {#each panels as item (item.id)}
+    {#if item.id === 'console' || item.id === 'network'}
+      <span class="visually-hidden" id="browser-evidence-count-{item.id}">{debuggerRecords[item.id] ? `${item.id === 'network' ? networkRows.length : debuggerRecords[item.id].length} captured ${item.id === 'network' ? 'requests' : 'events'}` : debuggerFailures[item.id] ? 'Evidence unavailable' : 'Count not yet available'}</span>
+    {/if}
   {/each}
-  {#each panels as name (name)}
-    <div id="browser-evidence-panel-{name}" role="tabpanel" aria-labelledby="browser-evidence-tab-{name}" hidden={panel !== name} tabindex={panel === name ? 0 : -1}>
-      {#if panel === name}
-        {#if name === 'screengraph'}
+  {#each panels as item (item.id)}
+    <div id="browser-evidence-panel-{item.id}" role="tabpanel" aria-labelledby="browser-evidence-tab-{item.id}" hidden={visiblePanel !== item.id} tabindex={visiblePanel === item.id ? 0 : -1}>
+      {#if visiblePanel === item.id}
+        {#if item.id === 'screengraph'}
           <RunScreenshots {runs} {runId} {events} {terminal} {viewport} {planSteps} title="Screengraph" graph {selectedStepId} {onSelect} />
         {:else if panelFailure}<p role="alert">{panelFailure}</p><button class="evidence-retry" onclick={() => { evidenceRetry += 1; }}>Retry evidence</button>
-        {:else if name === 'metrics'}
-          {#if metrics}<dl class="browser-metrics"><div><dt>Total credits</dt><dd>{metrics.creditsUsed ?? 'Not reported'}</dd></div><div><dt>Browser time</dt><dd>{metrics.browserTimeCreditsUsed ?? 'Not reported'}</dd></div><div><dt>Proxy data</dt><dd>{metrics.proxyDataCreditsUsed ?? 'Not reported'}</dd></div></dl>{:else}<p role="status">{!hasActivity ? 'No metrics yet.' : updatesPaused ? 'Metrics are temporarily unavailable.' : 'Loading metrics…'}</p>{/if}
+        {:else if item.id === 'metrics'}
+          {#if suppliedMetrics}<dl class="browser-metrics">{#each suppliedMetrics as metric, index (index)}<div><dt>{metric.label}</dt><dd>{metric.value}</dd></div>{/each}</dl>
+          {:else if metrics}<dl class="browser-metrics"><div><dt>Total credits</dt><dd>{metrics.creditsUsed ?? 'Not reported'}</dd></div><div><dt>Browser time</dt><dd>{metrics.browserTimeCreditsUsed ?? 'Not reported'}</dd></div><div><dt>Proxy data</dt><dd>{metrics.proxyDataCreditsUsed ?? 'Not reported'}</dd></div></dl>
+          {:else}<p role="status">{!hasActivity ? 'No metrics yet.' : updatesPaused ? 'Metrics are temporarily unavailable.' : 'Loading metrics…'}</p>{/if}
         {:else if records === null}<p role="status">{updatesPaused ? 'Activity is temporarily unavailable.' : 'Loading activity…'}</p>
-        {:else if name === 'network'}<NetworkPanel rows={networkRows} />
+        {:else if item.id === 'network'}<NetworkPanel rows={networkRows} />
         {:else}<ConsolePanel {records} />{/if}
       {/if}
     </div>
