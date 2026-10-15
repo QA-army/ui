@@ -2,7 +2,12 @@
 
 The QA.army web UI. Open source under the MIT License.
 
-This repository is the standalone interface for the QA workspace. It is separate from the hosted execution service.
+This repository is the standalone interface for the QA workspace. It is separate from the hosted execution service. The showcase renders the workbench components: run header, status, the seven step types, transcript, playback, and an instruction field. The steps on the page are samples.
+
+```sh
+npm install
+npm run dev
+```
 
 ## Adoption
 

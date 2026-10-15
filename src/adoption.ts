@@ -42,7 +42,7 @@ export async function recordAdoption(input: {
   if (!telemetryEnabled(input.storage, input.doNotTrack)) return false;
   let installId = input.storage.getItem(INSTALL_KEY);
   if (!installId) {
-    installId = (input.randomId ?? crypto.randomUUID)();
+    installId = input.randomId ? input.randomId() : crypto.randomUUID();
     input.storage.setItem(INSTALL_KEY, installId);
   }
   const record: AdoptionRecord = {

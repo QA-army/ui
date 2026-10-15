@@ -1,0 +1,45 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@500;600&family=Space+Grotesk:wght@600&display=swap");
+
+:root {
+  color-scheme: light;
+  --ink: #0b0b0e;
+  --text: #303036;
+  --paper: #f7f5f1;
+  --paper-soft: #fbfaf7;
+  --surface: #fffefa;
+  --surface-raised: #ffffff;
+  --muted: #66666e;
+  --line: #0b0b0e;
+  --line-soft: #d8d4cb;
+  --accent: #8a8dff;
+  --accent-strong: #6d71ed;
+  --run-passed: #079447;
+  --run-failed: #c4372d;
+  --run-ready: #59616e;
+  --run-running-dot: #e09b14;
+  --run-ready-dot: #667085;
+  --font-body: "Inter", system-ui, sans-serif;
+  --font-display: "Space Grotesk", "Inter", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --ink: #f4f1eb;
+  --text: #e5e3de;
+  --paper: #0b0b0e;
+  --paper-soft: #101115;
+  --surface: #16171b;
+  --surface-raised: #1e1f24;
+  --muted: #a9a9b0;
+  --line: #f4f1eb;
+  --line-soft: #44464f;
+  --accent: #a7a9ff;
+  --accent-strong: #8a8dff;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; min-height: 100%; background: var(--paper); color: var(--text); }
+body { font-family: var(--font-body); font-size: 16px; line-height: 1.5; }
+button, input, select { font: inherit; border-radius: 0; }
+:focus-visible { outline: 3px solid var(--accent-strong); outline-offset: 3px; }

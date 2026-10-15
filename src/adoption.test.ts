@@ -46,6 +46,13 @@ test("Do Not Track and an explicit opt-out send nothing", async () => {
   assert.equal(calls, 0);
 });
 
+test("the default install id is created without detaching crypto", async () => {
+  const storage = memory();
+  const fetch = async () => new Response(null, { status: 204 });
+  assert.equal(await recordAdoption({ version: "0.0.1", storage, fetch }), true);
+  assert.match(storage.getItem(INSTALL_KEY) ?? "", /^[0-9a-f-]{36}$/);
+});
+
 test("a failed collector does not throw", async () => {
   const fetch = async () => { throw new Error("offline"); };
   assert.equal(await recordAdoption({ version: "0.0.1", storage: memory(), fetch, randomId: () => "install-2" }), false);
