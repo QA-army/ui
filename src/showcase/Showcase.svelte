@@ -1,5 +1,6 @@
 <script lang="ts">
   import ActionButton from "../components/ActionButton.svelte";
+  import MobileRun from "../components/MobileRun.svelte";
   import ReplayBar from "../components/ReplayBar.svelte";
   import RunHeader from "../components/RunHeader.svelte";
   import StatusBadge from "../components/StatusBadge.svelte";
@@ -8,6 +9,7 @@
   import Transcript from "../components/Transcript.svelte";
   import { stepKinds, type StepKind } from "../components/step-kind.ts";
 
+  const mobileStates = ["passed", "running", "failed", "error"] as const;
   const kinds = Object.keys(stepKinds) as StepKind[];
   const statuses = ["passed", "failed", "error", "ready", "cancelled"] as const;
   const steps = [
@@ -38,6 +40,15 @@
       {theme === "dark" ? "Light" : "Dark"}
     </button>
   </header>
+
+  <section>
+    <h2>Mobile</h2>
+    <div class="phones">
+      {#each mobileStates as state (state)}
+        <MobileRun mode={state} />
+      {/each}
+    </div>
+  </section>
 
   <section>
     <h2>Run header</h2>
@@ -120,6 +131,7 @@
     cursor: pointer;
   }
   .theme:hover { background: var(--paper-soft); color: var(--ink); }
+  .phones { display: grid; gap: 28px; justify-items: center; }
   .stack { display: grid; border: 1px solid var(--line-soft); }
   .row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
   .actions { margin-top: 12px; }

@@ -4,6 +4,28 @@ The QA.army web UI. Open source under the MIT License.
 
 This repository is the standalone interface for the QA workspace. It is separate from the hosted execution service. The samples below are the workbench components.
 
+## Mobile
+
+Four states at phone width. The recording comes first, then the steps. Console, Network, Screengraph, and Metrics are not on this screen. The outcome sits beside the time.
+
+Passed keeps the recording and Rerun. Running is a live view: the clock and Stop, with no scrubber. Failed is a check that did not hold, and the recording is still there. Error means the result could not be trusted, so the recording is absent.
+
+### Passed
+
+![Passed on a phone. Every step has a green check, the recording can be replayed, and Rerun is the action.](docs/gallery/mobile-passed.png)
+
+### Running
+
+![Running on a phone. Live View, the clock, and Stop. The current step says Running. Later steps have not started.](docs/gallery/mobile-running.png)
+
+### Failed
+
+![Failed on a phone. The price check is a red square. Later steps have not run. The recording remains.](docs/gallery/mobile-failed.png)
+
+### Error
+
+![Error on a phone. The header says Error, the recording is unavailable, and the summary counts one error.](docs/gallery/mobile-error.png)
+
 ## Component gallery
 
 ### Status
