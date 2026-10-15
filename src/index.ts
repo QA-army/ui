@@ -1,10 +1,9 @@
-export {
-  ADOPTION_ENDPOINT,
-  CHOICE_KEY,
-  INSTALL_KEY,
-  recordAdoption,
-  setTelemetry,
-  telemetryEnabled,
-  type AdoptionRecord,
-  type AdoptionStorage,
-} from "./adoption.ts";
+export { default as ActionButton } from "./components/ActionButton.svelte";
+export { default as OutcomeIcon } from "./components/OutcomeIcon.svelte";
+export { default as ReplayBar } from "./components/ReplayBar.svelte";
+export { default as RunHeader } from "./components/RunHeader.svelte";
+export { default as StatusBadge } from "./components/StatusBadge.svelte";
+export { default as StepKindBadge } from "./components/StepKindBadge.svelte";
+export { default as TextField } from "./components/TextField.svelte";
+export { default as Transcript } from "./components/Transcript.svelte";
+export { stepKind, stepKinds, type StepKind, type StepMark } from "./components/step-kind.ts";

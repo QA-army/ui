@@ -102,32 +102,12 @@ All six Run page states, at phone width.
 | --- | --- |
 | ![Save test](docs/gallery/button-save.png) | ![Cancel](docs/gallery/button-cancel.png) |
 
-## Adoption
-
-The UI can report that it started, so QA.army can see whether the open interface is being used. A report contains only:
-
-- `event`: `ui_started`
-- `version`: the UI version
-- `install_id`: a random id created on the first start and kept in local storage
-- `surface`: `web`
-
-It does not include an account, Workspace, Test, Run, URL, or anything typed into the product. The browser's Do Not Track setting turns reporting off. Choosing off also deletes the stored install id.
-
-```ts
-import { recordAdoption, setTelemetry } from "qa-army-ui";
-
-await recordAdoption({ version: "0.0.1", storage: localStorage });
-setTelemetry(localStorage, "off");
-```
-
-Reports go to `https://qa.army/api/ui-adoption`. A network failure is ignored and does not affect the interface.
-
 ## Develop
 
 Requires Node.js 22 or newer.
 
 ```sh
-npm test
+npm run dev
 ```
 
 ## License
