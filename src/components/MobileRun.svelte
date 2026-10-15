@@ -251,7 +251,7 @@
     margin: 0;
     padding: 12px 14px;
     background: var(--surface-raised);
-    color: var(--run-failed, #c4372d);
+    color: #7a6230;
     font: 600 13px / 1.4 var(--font-body, Inter, sans-serif);
   }
   ol { margin: 0; padding: 0; list-style: none; background: var(--surface-raised); }

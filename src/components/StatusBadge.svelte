@@ -19,5 +19,6 @@
     text-transform: uppercase;
   }
   .passed { background: var(--run-passed, #079447); }
-  .failed, .error { background: var(--run-failed, #c4372d); }
+  .failed { background: var(--run-failed, #c4372d); }
+  .error { background: #dcc56a; color: #4a3c1a; }
 </style>
