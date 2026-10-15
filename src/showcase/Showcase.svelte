@@ -1,5 +1,11 @@
 <script lang="ts">
   import ActionButton from "../components/ActionButton.svelte";
+  import desktopError from "../../docs/gallery/desktop-error.png";
+  import desktopFailed from "../../docs/gallery/desktop-failed.png";
+  import desktopPassed from "../../docs/gallery/desktop-passed.png";
+  import desktopReady from "../../docs/gallery/desktop-ready.png";
+  import desktopRunning from "../../docs/gallery/desktop-running.png";
+  import desktopUnavailable from "../../docs/gallery/desktop-unavailable.png";
   import errorState from "../../docs/gallery/state-error.png";
   import failedState from "../../docs/gallery/state-failed.png";
   import passedState from "../../docs/gallery/state-passed.png";
@@ -14,6 +20,14 @@
   import Transcript from "../components/Transcript.svelte";
   import { stepKinds, type StepKind } from "../components/step-kind.ts";
 
+  const desktopStates = [
+    { label: "Passed", src: desktopPassed },
+    { label: "Running", src: desktopRunning },
+    { label: "Failed", src: desktopFailed },
+    { label: "Error", src: desktopError },
+    { label: "Ready", src: desktopReady },
+    { label: "Unavailable", src: desktopUnavailable },
+  ];
   const runStates = [
     { label: "Passed", src: passedState },
     { label: "Running", src: runningState },
@@ -52,6 +66,18 @@
       {theme === "dark" ? "Light" : "Dark"}
     </button>
   </header>
+
+  <section>
+    <h2>Desktop</h2>
+    <div class="desktop-states">
+      {#each desktopStates as item (item.label)}
+        <figure>
+          <figcaption>{item.label}</figcaption>
+          <img src={item.src} alt="{item.label} run on desktop" />
+        </figure>
+      {/each}
+    </div>
+  </section>
 
   <section>
     <h2>Mobile</h2>
@@ -156,6 +182,10 @@
     cursor: pointer;
   }
   .theme:hover { background: var(--paper-soft); color: var(--ink); }
+  .desktop-states { display: grid; gap: 28px; }
+  .desktop-states figure { margin: 0; }
+  .desktop-states figcaption { margin-bottom: 8px; color: var(--muted); font: 500 11px / 1.4 var(--font-mono, ui-monospace, monospace); letter-spacing: 0.08em; text-transform: uppercase; }
+  .desktop-states img { width: 100%; height: auto; display: block; border: 1px solid var(--line-soft); }
   .run-states { overflow-x: auto; }
   .run-states table { border-collapse: collapse; }
   .run-states th { padding: 0 8px 8px; color: var(--muted); font: 500 11px / 1.4 var(--font-mono, ui-monospace, monospace); letter-spacing: 0.08em; text-align: left; text-transform: uppercase; }
