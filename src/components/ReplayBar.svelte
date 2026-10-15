@@ -48,8 +48,21 @@
     min-width: 48px;
     height: 36px;
     margin: 0;
-    accent-color: var(--ink);
+    appearance: none;
+    background: transparent;
     border-radius: 0;
   }
+  input[type="range"]::-webkit-slider-runnable-track { height: 2px; background: var(--ink); border-radius: 0; }
+  input[type="range"]::-webkit-slider-thumb {
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    margin-top: -5px;
+    border: 0;
+    border-radius: 0;
+    background: var(--ink);
+  }
+  input[type="range"]::-moz-range-track { height: 2px; background: var(--ink); border: 0; border-radius: 0; }
+  input[type="range"]::-moz-range-thumb { width: 12px; height: 12px; border: 0; border-radius: 0; background: var(--ink); }
   select { width: 64px; }
 </style>

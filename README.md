@@ -2,12 +2,33 @@
 
 The QA.army web UI. Open source under the MIT License.
 
-This repository is the standalone interface for the QA workspace. It is separate from the hosted execution service. The showcase renders the workbench components: run header, status, the seven step types, transcript, playback, and an instruction field. The steps on the page are samples.
+This repository is the standalone interface for the QA workspace. It is separate from the hosted execution service. The samples below are the workbench components.
 
-```sh
-npm install
-npm run dev
-```
+## Component gallery
+
+### Run header
+
+![Finished and live run headers. Passed sits with the time and Rerun. A live run shows the amber mark, the green clock, and Stop.](docs/gallery/run-header.png)
+
+### Status
+
+![Passed, Failed, Error, Ready, and Cancelled.](docs/gallery/status.png)
+
+### Step types
+
+![Act, Verify, Login, Files, Screenshot, JavaScript, and Microphone.](docs/gallery/step-types.png)
+
+### Transcript
+
+![A sample transcript with a passed step, a failed step, a running step, and a step that has not started.](docs/gallery/transcript.png)
+
+### Playback
+
+![Play, previous, next, time, seek, speed, and fullscreen on one row.](docs/gallery/playback.png)
+
+### Instruction
+
+![An instruction field with Save test and Cancel.](docs/gallery/instruction.png)
 
 ## Adoption
 
