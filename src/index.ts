@@ -7,3 +7,5 @@ export { default as StepKindBadge } from "./components/StepKindBadge.svelte";
 export { default as TextField } from "./components/TextField.svelte";
 export { default as Transcript } from "./components/Transcript.svelte";
 export { stepKind, stepKinds, type StepKind, type StepMark } from "./components/step-kind.ts";
+export { default as RunPage } from "./run/RunDetail.svelte";
+export type { Run, RunClient, RunEvent, RunPageState, RunTest } from "./run/model.ts";

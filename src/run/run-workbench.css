@@ -1,0 +1,131 @@
+/* Run workbench rules. Notes stay in comments; the page shows evidence, status, and actions.
+   Square corners. Header Rerun and Stop Test are the only bordered buttons.
+   Live time, the in-progress step chip, and unexecuted dots fade between full strength and 50% over 2 seconds. The header running mark is a solid amber square that rotates over 2 seconds, with no scale and no fade. Reduced motion holds it still.
+   Do not put a RUNNING badge or a Live label in the header. The in-progress step chip still says RUNNING.
+   Passed, failed, and error step marks are solid squares, not chips.
+   Theme and feedback sit pinned to the transcript column's bottom-left.
+   Screenshots are an even two-column gallery aligned with the summary stats.
+   The recording is one attachment row under that gallery. */
+.run-shell {
+  --bg: #f7f5f1; --paper: #f7f5f1; --surface: #fffefa; --surface-raised: #ffffff; --stage-canvas: #ffffff; --paper-soft: #fbfaf7;
+  --line-soft: #d8d4cb; --text: #303036; --muted: #66666e; --ink: #0b0b0e;
+  --run-passed: #079447; --run-failed: #c4372d; --run-ready: #59616e;
+  --run-running-dot: #e09b14; --run-ready-dot: #667085;
+  --success: var(--run-passed); --danger: var(--run-failed); --danger-soft: #fce3df;
+}
+:root[data-theme='dark'] .run-shell {
+  --bg: #0b0b0e; --paper: #0b0b0e; --surface: #16171b; --surface-raised: #1e1f24; --stage-canvas: #1e1f24; --paper-soft: #101115;
+  --line-soft: #44464f; --text: #e5e3de; --muted: #a9a9b0; --ink: #f4f1eb; --danger-soft: #351b1b;
+}
+.run-shell button, .run-shell button:hover, .run-shell button:active, .run-shell button:disabled {
+  border: 0 !important; border-radius: 0 !important; box-shadow: none !important;
+}
+.run-shell input, .run-shell select { border-radius: 0; }
+.run-shell .button--primary, .run-shell .collaboration-primary, .run-shell .evidence-retry { background: #0b0b0e; color: #f7f5f1; }
+.run-shell .button--primary:hover:not(:disabled), .run-shell .collaboration-primary:hover:not(:disabled), .run-shell .evidence-retry:hover:not(:disabled) { background: #8a8dff; color: #0b0b0e; }
+.run-shell .collaboration-secondary { background: #ffffff; color: #0b0b0e; }
+.run-shell .run-stop { background: #fffefa; color: #c72c24; }
+.run-shell .run-stop:hover:not(:disabled) { background: #fce3df; }
+:root[data-theme='dark'] .run-shell .run-header button.run-stop { background: #1a1214; color: #ff8a82; border-color: #c4372d !important; }
+:root[data-theme='dark'] .run-shell .run-header button.run-stop:hover:not(:disabled) { background: #351b1b; color: #ffb0aa; }
+/* The Run header CTAs use the user's explicit bordered treatment. Other platform
+   buttons retain their borderless rule; all corners remain square. */
+.run-shell .run-header button.run-header-cta { border: 1px solid var(--line-soft) !important; min-height: 36px; padding: 8px 12px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font: 600 11px var(--font-mono); }
+.run-shell .run-header .run-rerun { background: transparent; color: var(--ink); }
+.run-shell .run-header .run-rerun:hover:not(:disabled) { background: var(--paper-soft); color: var(--ink); }
+@media (max-width: 900px) { .run-shell .run-header button.run-header-cta, .run-shell .run-header__duration { min-height: 44px; } }
+.run-shell .run-header { padding-block: 12px; }
+.run-shell .run-header__identity p, .run-shell .run-header__duration, .run-shell .run-connection,
+.run-shell .run-plan-link, .run-shell .run-refresh, .run-shell .run-evidence-disclosure summary, .run-shell .run-evidence-disclosure h3 { font-size: 11px; }
+@keyframes run-step-fade { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+@keyframes run-type-in { from { opacity: 0; } to { opacity: 1; } }
+.run-shell .run-header__duration { display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box; min-height: 36px; padding: 8px 12px; border: 1px solid var(--line-soft); }
+.run-shell .run-header__duration:not(.run-header__duration--live) { min-height: 0; padding: 2px 8px; font: 600 10px/1.4 var(--font-mono); }
+@media (max-width: 900px) { .run-shell .run-header__duration { display: none; } }
+.run-shell .run-header__duration--live { min-height: 36px; padding: 8px 12px; color: var(--run-passed); border-color: var(--run-passed); animation: run-step-fade 2s ease-in-out infinite; }
+.run-shell .outcome-solid--idle { animation: run-step-fade 2s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .run-shell .step-outcome--started,
+  .run-shell .run-header__duration--live,
+  .run-shell .run-status-dot--running,
+  .run-shell .run-status-dot--provisioning,
+  .run-shell .outcome-solid--idle { animation: none; }
+}
+.run-shell .run-badge, .run-shell .step-outcome {
+  display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;
+  background: var(--run-ready); color: #ffffff; padding: 3px 6px;
+  font: 600 10px/1.4 var(--font-mono); letter-spacing: .03em;
+}
+.run-shell .run-badge--passed { background: var(--run-passed); color: #ffffff; }
+.run-shell .run-badge--failed, .run-shell .run-badge--error { background: var(--run-failed); color: #ffffff; }
+.run-shell .step-outcome--passed, .run-shell .step-outcome--failed, .run-shell .step-outcome--error,
+.run-shell .step-outcome--mark { background: transparent; color: var(--text); padding: 0; }
+.run-shell .run-badge--running::before, .run-shell .run-badge--provisioning::before,
+.run-shell .run-badge--ready::before, .run-shell .run-badge--queued::before,
+.run-shell .step-outcome--waiting::before {
+  content: ''; display: inline-block; width: 5px; height: 5px; background: var(--run-ready-dot);
+}
+.run-shell .step-outcome--mark::before { content: none; }
+.run-shell .step-outcome--waiting.step-outcome--mark svg { display: block; }
+.run-shell .run-badge--running::before, .run-shell .run-badge--provisioning::before { background: var(--run-running-dot); }
+.run-shell .step-outcome--started { background: var(--run-passed); color: #ffffff; animation: run-step-fade 2s ease-in-out infinite; }
+.run-shell .step-outcome--started svg, .run-shell .step-outcome--waiting svg { display: none; }
+.run-shell .run-status-dot--passed { background: var(--run-passed); }
+.run-shell .run-status-dot--failed, .run-shell .run-status-dot--error { background: var(--run-failed); }
+.run-shell .run-status-dot--running, .run-shell .run-status-dot--provisioning {
+  width: 13px; height: 13px; background: var(--run-running-dot); opacity: 1; scale: 1;
+  animation: run-status-spin 2s linear infinite;
+}
+@keyframes run-status-spin { to { transform: rotate(360deg); } }
+.run-shell .run-status-dot--ready, .run-shell .run-status-dot--queued { background: var(--run-ready-dot); }
+/* The transcript label, step count, and time sit in the pane. They are not a separate bar. */
+.run-shell .run-transcript-heading { position: static; padding: 6px 12px 2px; gap: 8px; background: transparent; border-bottom: 0; }
+.run-shell .run-transcript-heading strong,
+.run-shell .run-transcript-heading span { font: 500 11px var(--font-mono); color: color-mix(in srgb, var(--muted) 72%, transparent); letter-spacing: .04em; }
+.run-shell .run-transcript-heading__time { margin-left: auto; }
+.run-shell .transcript-steps { padding: 0; }
+.run-shell .transcript-steps > li { border: 0; border-bottom: 1px solid var(--line-soft); }
+.run-shell .transcript-steps > li.is-selected { background: var(--surface-raised); border: 0; border-bottom: 1px solid var(--line-soft); }
+.run-shell .transcript-step-row { grid-template-columns: minmax(0, 1fr) 48px; padding: 0 8px; }
+.run-shell .transcript-step { grid-template-columns: max-content minmax(0, 1fr) auto; gap: 8px; padding: 10px 4px; align-items: center; }
+.run-shell .transcript-step-row > .transcript-step:only-child { grid-column: 1 / -1; padding-right: 0; }
+.run-shell .transcript-step:only-child .step-outcome { justify-self: end; }
+.run-shell .transcript-step__number { width: auto; height: auto; margin-right: -4px; font: 12px var(--font-mono); background: transparent; color: var(--muted); }
+.run-shell .transcript-step__content { display: flex; align-items: center; gap: 6px; }
+.run-shell .transcript-step__content .step-kind-badge { margin: 0; flex-shrink: 0; gap: 2px; text-transform: uppercase; font-size: 10px; padding: 3px 8px 3px 5px; }
+.run-shell .transcript-step__title { font: 700 13px/1.5 var(--font-body); overflow-wrap: anywhere; }
+.run-shell .transcript-step__title.is-pending { font-weight: 400; }
+.run-shell .transcript-step__content .step-kind-badge.is-quiet { padding: 3px; }
+.run-shell .transcript-step__seek { align-self: stretch; min-height: 36px; padding: 4px 0; font: 11px var(--font-mono); }
+.run-shell .transcript-attempts { padding: 0; background: var(--paper-soft); border-top: 1px solid var(--line-soft); }
+.run-shell .transcript-attempt { padding: 8px 12px; }
+.run-shell .attempt-divider { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 6px; margin: 0 0 5px; padding: 0 0 5px; border-bottom: 1px solid var(--line-soft); color: var(--muted); font: 11px var(--font-mono); }
+.run-shell .attempt-divider > span:first-child { text-transform: uppercase; letter-spacing: .05em; }
+.run-shell .transcript-attempt ul { border: 0; padding: 0; }
+.run-shell .transcript-attempt li { position: relative; }
+.run-shell .transcript-attempt li::before { content: ''; position: absolute; left: 8px; top: 0; bottom: 0; border-left: 1px solid var(--line-soft); }
+.run-shell .transcript-attempt li:last-child::before { bottom: 50%; }
+.run-shell .transcript-attempt li button { grid-template-columns: 16px minmax(0, 1fr) 42px; padding: 5px 0; gap: 6px; font: 11px/1.6 var(--font-mono); }
+.run-shell .activity-branch { width: 9px; margin-left: 8px; align-self: center; border-top: 1px solid var(--line-soft); }
+.run-shell .transcript-attempt li small { font: 10px var(--font-mono); }
+.run-shell .verification-detail { margin-top: 4px; padding: 6px 8px; background: var(--surface-raised); border-left: 2px solid var(--line-soft); font: 11px/1.6 var(--font-mono); }
+.run-shell .transcript-waiting { font: 11px/1.6 var(--font-mono); padding-left: 22px; }
+.run-shell .run-evidence-actions a { border: 0; background: var(--paper-soft); }
+@media (max-width: 900px) {
+  .run-shell .run-header { padding: 14px; flex-wrap: nowrap; align-items: flex-start; }
+  .run-shell .run-header__identity { flex: 1 1 auto; min-width: 0; max-width: none; }
+  .run-shell .run-header__identity h1 { white-space: normal; overflow-wrap: anywhere; max-width: 100%; }
+  .run-shell .run-header__actions { flex: 0 0 auto; width: auto; flex-wrap: nowrap; justify-content: flex-end; align-items: center; }
+  .run-shell .run-transcript-heading { flex-wrap: wrap; }
+  .run-shell .transcript-step { grid-template-columns: max-content minmax(0, 1fr) auto; align-items: center; }
+  .run-shell .transcript-step .transcript-step__content { display: flex; flex-wrap: nowrap; align-items: center; min-width: 0; }
+  .run-shell .transcript-step__content .step-kind-badge { flex-shrink: 0; max-width: none; white-space: nowrap; background: color-mix(in srgb, var(--type-paper) 28%, var(--surface)); color: color-mix(in srgb, var(--type-ink) 28%, var(--muted)); }
+  .run-shell .step-outcome, .run-shell .transcript-step:only-child .step-outcome { justify-self: end; align-self: center; }
+  .run-shell .step-outcome--mark { box-sizing: border-box; width: 16px; height: 16px; justify-content: center; align-items: center; }
+  .run-shell .step-outcome--mark .outcome-solid--pass,
+  .run-shell .step-outcome--mark .outcome-solid--fail { width: 16px; height: 16px; flex: 0 0 16px; }
+  .run-shell .transcript-step-row { align-items: center; grid-template-columns: minmax(0, 1fr) auto; }
+  .run-shell .transcript-step__seek { align-self: center; margin-top: 0; min-height: 22px; padding-left: 8px; }
+  .run-shell .transcript-step__content .step-kind-badge { font-size: 11px; }
+  .run-shell .transcript-attempt li button { min-height: 44px; font-size: 12px; }
+}

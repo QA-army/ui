@@ -4,6 +4,8 @@ The QA.army web UI. Open source under the MIT License.
 
 This repository is the standalone interface for the QA workspace. It is separate from the hosted execution service. The samples below are the workbench components.
 
+The full run page is [`src/run/RunDetail.svelte`](src/run/RunDetail.svelte). The hosted service supplies the Run, its events, and evidence. This package does not call that service.
+
 ## Desktop
 
 The run page at desktop width, light theme.
