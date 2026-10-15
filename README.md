@@ -6,29 +6,65 @@ This repository is the standalone interface for the QA workspace. It is separate
 
 ## Component gallery
 
-### Run header
-
-![Finished and live run headers. Passed sits with the time and Rerun. A live run shows the amber mark, the green clock, and Stop.](docs/gallery/run-header.png)
-
 ### Status
 
-![Passed, Failed, Error, Ready, and Cancelled.](docs/gallery/status.png)
+| Passed | Failed | Error | Ready | Cancelled |
+| --- | --- | --- | --- | --- |
+| ![Passed](docs/gallery/status-passed.png) | ![Failed](docs/gallery/status-failed.png) | ![Error](docs/gallery/status-error.png) | ![Ready](docs/gallery/status-ready.png) | ![Cancelled](docs/gallery/status-cancelled.png) |
 
 ### Step types
 
-![Act, Verify, Login, Files, Screenshot, JavaScript, and Microphone.](docs/gallery/step-types.png)
+| Act | Verify | Login | Files |
+| --- | --- | --- | --- |
+| ![Act](docs/gallery/step-act.png) | ![Verify](docs/gallery/step-verify.png) | ![Login](docs/gallery/step-login.png) | ![Files](docs/gallery/step-files.png) |
 
-### Transcript
+| Screenshot | JavaScript | Microphone |
+| --- | --- | --- |
+| ![Screenshot](docs/gallery/step-screenshot.png) | ![JavaScript](docs/gallery/step-javascript.png) | ![Microphone](docs/gallery/step-microphone.png) |
 
-![A sample transcript with a passed step, a failed step, a running step, and a step that has not started.](docs/gallery/transcript.png)
+### Outcomes
+
+| Passed | Failed | Running | Not started |
+| --- | --- | --- | --- |
+| ![Passed mark](docs/gallery/outcome-passed.png) | ![Failed mark](docs/gallery/outcome-failed.png) | ![Running](docs/gallery/outcome-running.png) | ![Not started](docs/gallery/outcome-queued.png) |
+
+### Header
+
+| Passed | Settled time | Rerun |
+| --- | --- | --- |
+| ![Passed](docs/gallery/header-passed.png) | ![Settled time](docs/gallery/header-time.png) | ![Rerun](docs/gallery/header-rerun.png) |
+
+| Running | Live time | Stop |
+| --- | --- | --- |
+| ![Running mark](docs/gallery/header-running.png) | ![Live time](docs/gallery/header-live.png) | ![Stop](docs/gallery/header-stop.png) |
+
+### Transcript rows
+
+![Passed step](docs/gallery/row-passed.png)
+
+![Failed step](docs/gallery/row-failed.png)
+
+![Running step](docs/gallery/row-running.png)
+
+![Step that has not started](docs/gallery/row-queued.png)
 
 ### Playback
 
-![Play, previous, next, time, seek, speed, and fullscreen on one row.](docs/gallery/playback.png)
+| Play | Previous | Next | Time |
+| --- | --- | --- | --- |
+| ![Play](docs/gallery/playback-play.png) | ![Previous](docs/gallery/playback-prev.png) | ![Next](docs/gallery/playback-next.png) | ![Elapsed time](docs/gallery/playback-time.png) |
+
+| Seek | Speed | Fullscreen |
+| --- | --- | --- |
+| ![Seek](docs/gallery/playback-seek.png) | ![Speed](docs/gallery/playback-speed.png) | ![Fullscreen](docs/gallery/playback-full.png) |
 
 ### Instruction
 
-![An instruction field with Save test and Cancel.](docs/gallery/instruction.png)
+![Instruction field](docs/gallery/field-instruction.png)
+
+| Save test | Cancel |
+| --- | --- |
+| ![Save test](docs/gallery/button-save.png) | ![Cancel](docs/gallery/button-cancel.png) |
 
 ## Adoption
 
