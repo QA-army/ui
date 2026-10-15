@@ -10,21 +10,9 @@ Four states at phone width. The recording comes first, then the steps. Console, 
 
 Passed keeps the recording and Rerun. Running is a live view: the clock and Stop, with no scrubber. Failed is a check that did not hold, and the recording is still there. Error means the result could not be trusted, so the recording is absent.
 
-### Passed
-
-![Passed on a phone. Every step has a green check, the recording can be replayed, and Rerun is the action.](docs/gallery/mobile-passed.png)
-
-### Running
-
-![Running on a phone. Live View, the clock, and Stop. The current step says Running. Later steps have not started.](docs/gallery/mobile-running.png)
-
-### Failed
-
-![Failed on a phone. The price check is a red square. Later steps have not run. The recording remains.](docs/gallery/mobile-failed.png)
-
-### Error
-
-![Error on a phone. The header says Error, the recording is unavailable, and the summary counts one error.](docs/gallery/mobile-error.png)
+| Passed | Running | Failed | Error |
+| --- | --- | --- | --- |
+| ![Passed on a phone. Every step has a green check, the recording can be replayed, and Rerun is the action.](docs/gallery/mobile-passed.png) | ![Running on a phone. Live View, the clock, and Stop. The current step says Running. Later steps have not started.](docs/gallery/mobile-running.png) | ![Failed on a phone. The price check is a red square. Later steps have not run. The recording remains.](docs/gallery/mobile-failed.png) | ![Error on a phone. The header says Error, the recording is unavailable, and the summary counts one error.](docs/gallery/mobile-error.png) |
 
 ## Component gallery
 
